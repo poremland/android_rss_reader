@@ -1,3 +1,22 @@
+# Android RSS Reader
+> A river style RSS reader for Android.
+
+> River style RSS reader displays all the current feed entries for the blogs you subscribe to.  This differs from a *"read and mark"* style rss reader which tracks which entries you've read.
+
+> The intent of this is to give you an *"at a glance"* look at what's going on with the blogs you follow.
+
+# Features
+
+* Add blogs to follow
+
+* Phone and tablet support with a UI optimized to utilize space better on larger screens.
+
+* Share blog posts as you read.
+
+* Copy a blog post url to the clipboard.
+
+* Open a blog post in your default browser.
+
 ## Setup
 > Update the v7 appcompat project
 
