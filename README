@@ -1,0 +1,17 @@
+## Setup
+> Update the v7 appcompat project
+
+	$ android update project -p /path/to/Android/android-sdk/extras/android/support/v7/appcompat/ -t android-18
+
+> Add the path to your Android SDK to your local.properties file
+
+	$ echo "sdk.dir=/path/to/Android/android-sdk/" >> local.properties
+
+> Create a symbolic link to the v7 appcompat library project
+> *NOTE: MUST BE RELATIVE PATH*
+
+	# *nix (OS X, Linux, Unix)
+	$ ln -s relative/path/to/Android/android-sdk/extras/android/support/v7/appcompat/ v7appcompat
+
+	# Windows
+	> C:\mklink \D v7appcompat C:\Path\To\Android\android-sdk\extras\android\support\v7\appcompat

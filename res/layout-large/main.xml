@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/fragment_container"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+	<fragment android:name="net.oremland.rss.reader.fragments.FeedsListFragment"
+		android:id="@+id/feeds_list_fragment"
+		android:layout_weight="1"
+		android:layout_width="0dp"
+		android:layout_height="match_parent" />
+	<fragment android:name="net.oremland.rss.reader.fragments.FeedItemsListFragment"
+		android:id="@+id/feed_items_list_fragment"
+		android:layout_width="0dp"
+		android:layout_height="match_parent" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<item type="id" name="add_feed_fragment" />
+	<item type="id" name="feeds_list_fragment" />
+	<item type="id" name="feed_items_list_fragment" />
+	<item type="id" name="browser_fragment" />
+</resources>

@@ -1,0 +1,5 @@
+local.properties
+v7appcompat
+bin/
+gen/
+.DS_Store

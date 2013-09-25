@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Rss Reader: Big Android BBQ 2013</string>
+	<string name="loading">Loading...</string>
+	<string name="menu_add">Add Feed</string>
+	<string name="menu_share">Share</string>
+	<string name="menu_viewOriginal">View Original Link</string>
+	<string name="menu_copyUrl">Copy Url To Clipboard</string>
+	<string name="loading">Loading...</string>
+</resources>

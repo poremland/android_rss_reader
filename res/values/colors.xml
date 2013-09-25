@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<color name="white">#FFFFFFFF</color>
+	<color name="black">#FF000000</color>
+	<color name="silverGray">#FF7E96A0</color>
+	<color name="transparent">#00FFFFFF</color>
+	<color name="yellow">#FFFFFF00</color>
+	<color name="dark_blue">#FF006699</color>
+	<color name="dark_purple">#FF660099</color>
+	<color name="list_background">@color/white</color>
+	<color name="list_divider_background">#FFD3D3D3</color>
+	<color name="list_row_background">@color/white</color>
+</resources>
