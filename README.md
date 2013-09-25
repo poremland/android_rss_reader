@@ -7,6 +7,8 @@
 
 # Features
 
+* Support for Android 2.3 and above
+
 * Add blogs to follow
 
 * Phone and tablet support with a UI optimized to utilize space better on larger screens.
