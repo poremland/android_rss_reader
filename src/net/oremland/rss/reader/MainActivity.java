@@ -19,7 +19,7 @@
  ***********************************************************************************************************************/
 package net.oremland.rss.reader;
 
-import android.os.Bundle;
+import android.os.*;
 import android.support.v4.app.*;
 import android.support.v7.app.*;
 import android.text.*;
@@ -381,6 +381,14 @@ public class MainActivity
 		this.updateHomeButton(id);
 		this.optionsMenuId = this.getDefaultOptionsMenuId();
 		this.invalidateOptionsMenu();
+	}
+
+	public void invalidateOptionsMenu()
+	{
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
+			super.invalidateOptionsMenu();
+		}
 	}
 
 	private int getDefaultOptionsMenuId()
