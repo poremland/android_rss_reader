@@ -110,9 +110,10 @@ public class MainActivity
 	@Override
 	public void onBackPressed()
 	{
-		this.popBackStack();
-
-		this.updateHomeButton();
+		if(!this.popBackStack())
+		{
+			this.finish();
+		}
 	}
 
 	@Override
@@ -361,26 +362,46 @@ public class MainActivity
 		return Integer.toString(id);
 	}
 
-	private void popBackStack()
+	private boolean popBackStack()
 	{
+		boolean wasBackStackPopped = false;
 		FragmentManager manager = getSupportFragmentManager();
-		int backStackEntryCount = manager.getBackStackEntryCount();
-		boolean isTablet = this.getResources().getBoolean(R.bool.isTablet);
-		int initialBackStackCount = isTablet ? 0 : 1;
-		if(backStackEntryCount == initialBackStackCount)
+		if(manager != null)
 		{
-			this.finish();
+			if(this.shouldPopBackStack(manager))
+			{
+				this.popBackStack(manager);
+				wasBackStackPopped = true;
+			}
+			this.optionsMenuId = this.getDefaultOptionsMenuId();
+			this.invalidateOptionsMenu();
 		}
-		if(backStackEntryCount > 0)
-		{
-			this.popBackStack(manager);
-		}
-		int id = backStackEntryCount > 1 ?
-			Integer.parseInt(manager.getBackStackEntryAt(backStackEntryCount - 2).getName()) :
-			R.id.feeds_list_fragment;
+		int id = this.idForPreviousBackStackEntry(manager);
 		this.updateHomeButton(id);
-		this.optionsMenuId = this.getDefaultOptionsMenuId();
-		this.invalidateOptionsMenu();
+		return wasBackStackPopped;
+	}
+
+	private boolean shouldPopBackStack(FragmentManager manager)
+	{
+		return manager.getBackStackEntryCount() > this.initialBackStackCount();
+	}
+
+	private int initialBackStackCount()
+	{
+		boolean isTablet = this.getResources().getBoolean(R.bool.isTablet);
+		return isTablet ? 0 : 1;
+	}
+
+	private int idForPreviousBackStackEntry(FragmentManager manager)
+	{
+		int entryCount = manager.getBackStackEntryCount();
+		int initialCount = this.initialBackStackCount();
+		if(entryCount > initialCount)
+		{
+			FragmentManager.BackStackEntry entry = manager.getBackStackEntryAt(entryCount - initialCount);
+			return Integer.parseInt(entry.getName());
+		}
+		return R.id.feeds_list_fragment;
 	}
 
 	public void invalidateOptionsMenu()
@@ -438,15 +459,13 @@ public class MainActivity
 		FragmentManager manager = getSupportFragmentManager();
 		if(manager != null)
 		{
-			int backStackEntryCount = manager.getBackStackEntryCount();
 			String name = this.getFragmentIdAsString(id);
 			boolean isTablet = this.getResources().getBoolean(R.bool.isTablet);
-			boolean isFeedsListCurrent = name.equals(this.getFragmentIdAsString(R.id.feeds_list_fragment));
-			boolean isNotTabletAndNotOnFirstFragment = !isTablet && !isFeedsListCurrent;
+			boolean isOnFeedsList = name.equals(this.getFragmentIdAsString(R.id.feeds_list_fragment));
+			boolean isNotTabletAndNotOnFirstFragment = !isTablet && !isOnFeedsList;
 			boolean isInLayout = this.getFragment(id) != null && this.getFragment(id).isInLayout();
-			boolean isTabletAndOnBrowser = isTablet && !isInLayout;
-
-			this.updateHomeButton(isNotTabletAndNotOnFirstFragment || isTabletAndOnBrowser);
+			boolean isTabletAndOnFragmentNotInLayout = isTablet && !isInLayout;
+			this.updateHomeButton(isNotTabletAndNotOnFirstFragment || isTabletAndOnFragmentNotInLayout);
 		}
 	}
 
