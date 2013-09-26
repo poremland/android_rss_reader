@@ -1,4 +1,4 @@
-# Android RSS Reader
+# Streamly RSS Reader
 > A river style RSS reader for Android.
 
 > River style RSS reader displays all the current feed entries for the blogs you subscribe to.  This differs from a *"read and mark"* style rss reader which tracks which entries you've read.
