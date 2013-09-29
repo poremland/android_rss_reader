@@ -119,6 +119,13 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 		this.setFieldsFromBundle(this.getArguments());
 		this.models = this.getSavedModels(savedInstanceState);
 		this.ensureModelsTreeMapIsInitialized();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+
 		this.load();
 	}
 
