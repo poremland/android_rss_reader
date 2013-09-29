@@ -30,7 +30,7 @@
 	<style name="FeedDescription" parent="FeedMetaData">
 		<item name="android:textSize">12sp</item>
 	</style>
-	<style name="BaseListViewLayout">
+	<style name="ListRow">
 		<item name="android:background">@color/list_row_background</item>
 		<item name="android:orientation">vertical</item>
 		<item name="android:paddingLeft">4dp</item>
@@ -38,7 +38,8 @@
 		<item name="android:paddingTop">10dp</item>
 		<item name="android:paddingBottom">10dp</item>
 	</style>
-	<style name="FeedLayout" parent="BaseListViewLayout">
+	<style name="FeedRow" parent="ListRow">
+		<item name="android:background">@drawable/row_background</item>
 	</style>
 	<style name="ListStyle">
 		<item name="android:background">@color/list_background</item>
