@@ -75,6 +75,7 @@ public class FeedItemsListFragment
 	public void setFeed(Feed feed)
 	{
 		this.feed = feed;
+		this.shouldUpdateModelList();
 	}
 
 	@Override

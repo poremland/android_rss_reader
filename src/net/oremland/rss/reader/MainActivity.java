@@ -36,6 +36,7 @@ public class MainActivity
 	extends
 		ActionBarActivity
 	implements
+		AddFeedFragment.OnFeedListChangedListener,
 		FeedsListFragment.OnFeedSelectedListener,
 		FeedItemsListFragment.OnFeedItemSelectedListener
 {
@@ -147,6 +148,16 @@ public class MainActivity
 			this.hideFragmentInLayout(R.id.feeds_list_fragment, transaction);
 			this.hideFragmentInLayout(R.id.feed_items_list_fragment, transaction);
 			transaction.commit();
+		}
+	}
+
+	@Override
+	public void onFeedListChanged()
+	{
+		Fragment fragment = this.getFragment(R.id.feeds_list_fragment);
+		if(fragment != null)
+		{
+			((FeedsListFragment)fragment).load();
 		}
 	}
 
