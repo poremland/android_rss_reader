@@ -70,6 +70,34 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 		return Collections.reverseOrder(Collections.reverseOrder());
 	}
 
+	protected void shouldUpdateModelList()
+	{
+		if(this.clearModels() || this.clearAdapter())
+		{
+			this.updateListView();
+		}
+	}
+
+	private boolean clearAdapter()
+	{
+		if(this.adapter != null)
+		{
+			this.adapter.clear();
+			return true;
+		}
+		return false;
+	}
+
+	private boolean clearModels()
+	{
+		if(this.models != null)
+		{
+			this.models.clear();
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -87,11 +115,17 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 	{
 		super.onActivityCreated(savedInstanceState);
 
-		this.setProgressBarVisibility(View.VISIBLE);
 		this.initializeList();
 		this.setFieldsFromBundle(this.getArguments());
 		this.models = this.getSavedModels(savedInstanceState);
 		this.ensureModelsTreeMapIsInitialized();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+
 		this.load();
 	}
 
@@ -107,6 +141,7 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 	{
 		if(!this.didLoadExistingModels() || !this.canCacheModels())
 		{
+			this.setProgressBarVisibility(View.VISIBLE);
 			this.loadModelList(new OnModelsLoadedListener<TModel>()
 			{
 				@Override
@@ -143,6 +178,7 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 	private void initializeList()
 	{
 		this.list = getListView();
+		this.list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		this.list.setOnItemClickListener(this.getListViewClickListener());
 	}
 
@@ -152,6 +188,8 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 		{
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
+				list.setItemChecked(position, true);
+				list.setSelection(position);
 				TModel item = (TModel)parent.getAdapter().getItem(position);
 				displayModel(item);
 			}

@@ -35,6 +35,24 @@ public class AddFeedFragment
 	extends
 		Fragment
 {
+	private OnFeedListChangedListener listener = null;
+
+	public interface OnFeedListChangedListener
+	{
+		void onFeedListChanged();
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
+		if(getActivity() instanceof OnFeedListChangedListener)
+		{
+			listener = (OnFeedListChangedListener)getActivity();
+		}
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.add_feed_fragment, container, false);
@@ -103,6 +121,7 @@ public class AddFeedFragment
 		FeedHelper helper = this.getFeedHelper();
 		helper.addFeed(feed);
 		Toast.makeText(getContext(), name + " has been added", Toast.LENGTH_SHORT).show();
+		this.notifyListenerOfFeedListChanged();
 	}
 
 	protected FeedHelper getFeedHelper()
@@ -113,5 +132,13 @@ public class AddFeedFragment
 	protected Context getContext()
 	{
 		return getActivity();
+	}
+
+	protected void notifyListenerOfFeedListChanged()
+	{
+		if(this.listener != null)
+		{
+			this.listener.onFeedListChanged();
+		}
 	}
 }
