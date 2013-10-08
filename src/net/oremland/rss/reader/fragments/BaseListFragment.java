@@ -313,6 +313,6 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 				return ObjectSerializer.fromString(s);
 			}
 		}
-		return null;
+		return this.models;
 	}
 }
