@@ -32,7 +32,7 @@ import net.oremland.rss.reader.fragments.FeedItemsListFragment.OnFeedItemSelecte
 import net.oremland.rss.reader.helpers.*;
 import net.oremland.rss.reader.mock.*;
 import net.oremland.rss.reader.models.*;
-
+ 
 public class FeedItemsListFragmentTest
 	extends
 		AndroidTestCase
@@ -40,21 +40,23 @@ public class FeedItemsListFragmentTest
 	private List<FeedItem> models = Arrays.asList(new FeedItem[] { new FeedItem("Boo", "Foo", "Bar", "Baz", new Date()) });
 	private Feed feed = new Feed("test", "test");
 	private FeedItemsListFragment fragment = null;
-	private boolean methodWasCalled = false;
-	private boolean executeWasCalled = false;
+	private boolean getFeedItemsWasCalled = false;
 	private boolean modelsLoadedListenerWasCalled = false;
 	private boolean feedItemSelectedListenerWasCalled = false;
 	private OnFeedItemSelectedListener feedItemSelectedListener = null;
 	private OnModelsLoadedListener<FeedItem> modelsLoadedListener = null;
+	private OnModelsLoadedListener<FeedItem> listenerSentToHelper = null;
+	private String urlSentToHelper = null;
 
 	public void setUp()
 	{
-		methodWasCalled = false;
-		executeWasCalled = false;
+		getFeedItemsWasCalled = false;
 		modelsLoadedListenerWasCalled = false;
 		feedItemSelectedListenerWasCalled = false;
 		feedItemSelectedListener = this.createFeedItemSelectedListener();
 		modelsLoadedListener = this.createModelsLoadedListener();
+		listenerSentToHelper = null;
+		urlSentToHelper = null;
 		fragment = this.createFragment();
 		fragment.setFeed(feed);
 	}
@@ -76,29 +78,16 @@ public class FeedItemsListFragmentTest
 			}
 
 			@Override
-			protected void parseItemsFromData(OnModelsLoadedListener<FeedItem> listener, String data)
+			protected FeedItemHelper createHelper()
 			{
-				listener.onModelsLoaded(models);
-			}
-
-			@Override
-			protected AsyncHttpDownloader getDownloader()
-			{
-				return new AsyncHttpDownloader()
+				return new FeedItemHelper()
 				{
 					@Override
-					protected byte[] doInBackground(String... urls)
+					public void getFeedItems(String url, OnModelsLoadedListener<FeedItem> listener)
 					{
-						executeWasCalled = true;
-						assertEquals(feed.getUrl(), urls[0]);
-						try
-						{
-							return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><feed />".getBytes("UTF-8");
-						}
-						catch(Exception e)
-						{
-						}
-						return new byte[0];
+						getFeedItemsWasCalled = true;
+						urlSentToHelper = url;
+						listenerSentToHelper = listener;
 					}
 				};
 			}
@@ -140,24 +129,6 @@ public class FeedItemsListFragmentTest
 		assertSame(feed, fragment.getFeed());
 	}
 
-	public void test_displayModel_CallsOnFeedItemSelectedOnListener()
-	{
-		fragment.displayModel(models.get(0));
-		assertTrue(feedItemSelectedListenerWasCalled);
-	}
-
-	public void test_displayModel_DoesNotCallOnFeedItemSelectedOnListener_WhenListenerIsNull()
-	{
-		try
-		{
-			fragment.displayModel(models.get(0));
-		}
-		catch(Exception e)
-		{
-			fail();
-		}
-	}
-
 	public void test_createAdapter_CreatesFeedItemsAdapter()
 	{
 		FeedItemsAdapter adapter = fragment.createAdapter();
@@ -165,48 +136,28 @@ public class FeedItemsListFragmentTest
 		assertTrue(adapter instanceof FeedItemsAdapter);
 	}
 
-	public void test_loadModelList_DoesNotPassFeedItemsToListener_WhenListenerIsNull()
+	public void test_loadModelList_DoesNotGetFeedItems_WhenListenerIsNull()
 	{
-		try
-		{
-			fragment.loadModelList(null);
-		}
-		catch(Exception e)
-		{
-			fail();
-		}
+		fragment.loadModelList(null);
+		assertFalse(getFeedItemsWasCalled);
 	}
 
-	public void test_loadModelList_DoesNotExecuteHttpRequest_IfFeedIsNull()
+	public void test_loadModelList_DoesNotGetFeedItems_IfFeedIsNull()
 	{
 		fragment.setFeed(null);
 		fragment.loadModelList(modelsLoadedListener);
-		assertFalse(executeWasCalled);
+		assertFalse(getFeedItemsWasCalled);
 	}
 
-	public void test_loadModelList_ExecutesHttpRequestForFeedItems()
+	public void test_loadModelList_GetsFeedItems()
 	{
 		fragment.loadModelList(modelsLoadedListener);
-		this.sleepFor(250);
-		assertTrue(executeWasCalled);
+		assertTrue(getFeedItemsWasCalled);
 	}
 
-	public void test_loadModelList_PassesFeedItemsToListener()
+	public void test_loadModelList_PassesModelsLoadedListenerToHelper()
 	{
 		fragment.loadModelList(modelsLoadedListener);
-		this.sleepFor(250);
-		assertTrue(modelsLoadedListenerWasCalled);
-	}
-
-	private void sleepFor(int milliseconds)
-	{
-		try
-		{
-			Thread.sleep(milliseconds);
-		}
-		catch(Exception exception)
-		{
-			fail();
-		}
+		assertSame(modelsLoadedListener, listenerSentToHelper);
 	}
 }
