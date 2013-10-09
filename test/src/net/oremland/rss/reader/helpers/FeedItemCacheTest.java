@@ -67,4 +67,13 @@ public class FeedItemCacheTest
 		assertNotNull(list);
 		assertEquals(0, list.size());
 	}
+
+	public void test_asList_ReturnsListWithFeedItems()
+	{
+		FeedItem item = new FeedItem("Boo", "Foo", "Bar", "Baz", new Date());
+		cache.add(item);
+		List<FeedItem> list = cache.asList();
+		assertEquals(1, list.size());
+		assertEquals(item, list.get(0));
+	}
 }
