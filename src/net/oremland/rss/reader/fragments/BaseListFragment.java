@@ -48,7 +48,7 @@ public abstract class BaseListFragment<TModel extends BaseModel, TAdapter extend
 	private TAdapter adapter;
 	private TreeMap<String, TModel> models;
 
-	protected interface OnModelsLoadedListener<TModel extends BaseModel>
+	public interface OnModelsLoadedListener<TModel extends BaseModel>
 	{
 		public void onModelsLoaded(List<TModel> models);
 	}

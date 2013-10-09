@@ -98,9 +98,14 @@ public class FeedItemsListFragment
 	{
 		if(listener != null && this.feed != null)
 		{
-			AsyncHttpDownloader downloader = this.createDownloader(listener);
-			downloader.execute(this.feed.getUrl());
+			FeedItemHelper helper = this.createHelper();
+			helper.getFeedItems(this.feed.getUrl(), listener);
 		}
+	}
+
+	protected FeedItemHelper createHelper()
+	{
+		return new FeedItemHelper();
 	}
 
 	@Override
@@ -112,91 +117,5 @@ public class FeedItemsListFragment
 	protected Context getContext()
 	{
 		return getActivity();
-	}
-
-	private AsyncHttpDownloader createDownloader(final OnModelsLoadedListener<FeedItem> listener)
-	{
-		AsyncHttpDownloader downloader = this.getDownloader();
-		downloader.setOnDownloadListener(new AsyncHttpDownloader.OnDownloadListener()
-		{
-			public void onProgress(int progress)
-			{
-				onTaskProgress(listener, progress);
-			}
-
-			public void onComplete(byte[] result)
-			{
-				onDownloadComplete(listener, result);
-			}
-
-			public void onError(Exception exception)
-			{
-				onTaskError(listener, exception);
-			}
-
-		});
-		return downloader;
-	}
-
-	protected AsyncHttpDownloader getDownloader()
-	{
-		return new AsyncHttpDownloader();
-	}
-
-	private void onTaskProgress(OnModelsLoadedListener<FeedItem> listener, int progress)
-	{
-	}
-
-	private void onDownloadComplete(OnModelsLoadedListener<FeedItem> listener, byte[] result)
-	{
-		if(listener != null && result != null && result.length > 0)
-		{
-			String data = new String(result);
-			parseItemsFromData(listener, data);
-		}
-	}
-
-	private void onTaskError(OnModelsLoadedListener<FeedItem> listener, Exception exception)
-	{
-		Log.e(this.getClass().getName(), exception.toString(), exception);
-	}
-
-	protected void parseItemsFromData(OnModelsLoadedListener<FeedItem> listener, String data)
-	{
-		FeedParser parser = new FeedParser();
-		parser.setOnParseListener(this.createOnParseListener(listener));
-		parser.execute(data);
-	}
-
-	private FeedParser.OnParseListener createOnParseListener(final OnModelsLoadedListener<FeedItem> listener)
-	{
-		return new FeedParser.OnParseListener()
-		{
-			@Override
-			public void onProgress(int progress)
-			{
-				onTaskProgress(listener, progress);
-			}
-
-			@Override
-			public void onComplete(List<FeedItem> items)
-			{
-				onParseComplete(listener, items);
-			}
-
-			@Override
-			public void onError(Exception exception)
-			{
-				onTaskError(listener, exception);
-			}
-		};
-	}
-
-	private void onParseComplete(OnModelsLoadedListener<FeedItem> listener, List<FeedItem> items)
-	{
-		if(listener != null && items != null)
-		{
-			listener.onModelsLoaded(items);
-		}
 	}
 }
