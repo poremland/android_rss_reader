@@ -25,7 +25,8 @@ import net.oremland.rss.reader.models.*;
 
 public class FeedItemCache
 {
-	private ArrayList<FeedItem> items = new ArrayList<FeedItem>();
+	private final static int expirationMilliseconds = 1000 * (15 * 60);
+	private ArrayList<CacheItem> items = new ArrayList<CacheItem>();
 	private static FeedItemCache instance;
 	static
 	{
@@ -41,6 +42,11 @@ public class FeedItemCache
 		return instance;
 	}
 
+	protected int expireIfOlderThanMilliseconds()
+	{
+		return expirationMilliseconds;
+	}
+
 	public int size()
 	{
 		return items.size();
@@ -49,14 +55,58 @@ public class FeedItemCache
 	
 	public synchronized void add(FeedItem item)
 	{
-		if(!items.contains(item))
+		if(!items.contains(new CacheItem(item)))
 		{
-			items.add(item);
+			items.add(new CacheItem(item));
 		}
 	}
 
-	public List<FeedItem> asList()
+	public synchronized List<FeedItem> asList()
 	{
-		return new ArrayList<FeedItem>(items);
+		ArrayList<FeedItem> list = new ArrayList<FeedItem>();
+		ArrayList<CacheItem> purged = new ArrayList<CacheItem>();
+		for(CacheItem item : items)
+		{
+			if(!this.isExpired(item))
+			{
+				purged.add(item);
+				list.add(item.item);
+			}
+		}
+		items = purged;
+		return list;
+	}
+
+	private boolean isExpired(CacheItem item)
+	{
+		long diff = new Date().getTime() - item.cachedAt.getTime();
+		return diff >= this.expireIfOlderThanMilliseconds();
+	}
+
+	private class CacheItem
+	{
+		public final Date cachedAt = new Date();
+		public final FeedItem item;
+
+		public CacheItem(FeedItem item)
+		{
+			this.item = item;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if(obj == null)
+			{
+				return false;
+			}
+
+			if(obj instanceof CacheItem)
+			{
+				return ((CacheItem)obj).item.equals(this.item);
+			}
+
+			return false;
+		}
 	}
 }

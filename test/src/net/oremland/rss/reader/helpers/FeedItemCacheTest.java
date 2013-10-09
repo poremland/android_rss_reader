@@ -30,10 +30,19 @@ public class FeedItemCacheTest
 		AndroidTestCase
 {
 	private FeedItemCache cache = null;
+	private int expirationMilliseconds = 1000 * (15 * 60);
 
 	public void setUp()
 	{
-		cache = new FeedItemCache();
+		expirationMilliseconds = 1000 * (15 * 60);
+		cache = new FeedItemCache()
+		{
+			@Override
+			protected int expireIfOlderThanMilliseconds()
+			{
+				return expirationMilliseconds;
+			}
+		};
 	}
 
 	public void test_instance_ReturnsSameInstance()
@@ -76,4 +85,26 @@ public class FeedItemCacheTest
 		assertEquals(1, list.size());
 		assertEquals(item, list.get(0));
 	}
+
+	public void test_asList_DoesNotIncludeExpiredFeedItems()
+	{
+		FeedItem item = new FeedItem("Boo", "Foo", "Bar", "Baz", new Date());
+		cache.add(item);
+		expirationMilliseconds = 10;
+		sleepFor(15);
+		List<FeedItem> list = cache.asList();
+		assertEquals(0, list.size());
+	}
+
+	private void sleepFor(int milliseconds)
+	{
+		try
+		{
+			Thread.sleep(milliseconds);
+		}
+		catch(Exception exception)
+		{
+			fail();
+		}
+ 	}
 }
