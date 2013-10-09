@@ -45,11 +45,6 @@ public class FeedItemCacheTest
 		};
 	}
 
-	public void test_instance_ReturnsSameInstance()
-	{
-		assertSame(FeedItemCache.instance(), FeedItemCache.instance());
-	}
-
 	public void test_size_ReturnsZeroWhenEmpty()
 	{
 		assertEquals(0, cache.size());

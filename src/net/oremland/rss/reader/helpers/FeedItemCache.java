@@ -27,19 +27,9 @@ public class FeedItemCache
 {
 	private final static int expirationMilliseconds = 1000 * (15 * 60);
 	private ArrayList<CacheItem> items = new ArrayList<CacheItem>();
-	private static FeedItemCache instance;
-	static
-	{
-		instance = new FeedItemCache();
-	}
 
-	protected FeedItemCache()
+	public FeedItemCache()
 	{
-	}
-
-	public static FeedItemCache instance()
-	{
-		return instance;
 	}
 
 	protected int expireIfOlderThanMilliseconds()
