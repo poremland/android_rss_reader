@@ -35,8 +35,11 @@ public class FeedItemHelperTest
 	private FeedItemHelper helper;
  	private OnModelsLoadedListener<FeedItem> modelsLoadedListener = null;
 	private boolean executeWasCalled = false;
+	private boolean shouldReturnCachedItems = false;
  	private boolean modelsLoadedListenerWasCalled = false;
 	private final static String url = "http://foo";
+ 	private List<FeedItem> loadedModels = null;
+	private int cachedFeedItems = 0;
 
 	public void setUp()
 	{
@@ -44,6 +47,8 @@ public class FeedItemHelperTest
 		modelsLoadedListener = this.createListener();
 		executeWasCalled = false;
 		modelsLoadedListenerWasCalled = false;
+		shouldReturnCachedItems = false;
+		cachedFeedItems = 0;
 	}
 
 	private FeedItemHelper createHelper()
@@ -55,6 +60,26 @@ public class FeedItemHelperTest
  			{
 				return createDownloader();
  			}
+
+			@Override
+			protected FeedItemCache cacheForUrl(String url)
+			{
+				return new FeedItemCache()
+				{
+					@Override
+					public void add(FeedItem item)
+					{
+						cachedFeedItems++;
+					}
+
+					@Override
+					public List<FeedItem> asList()
+					{
+						return shouldReturnCachedItems ? models : new ArrayList<FeedItem>();
+					}
+				};
+				
+			}
 		};
 	}
 
@@ -69,7 +94,7 @@ public class FeedItemHelperTest
 				assertEquals(url, urls[0]);
 				try
 				{
-					return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><feed />".getBytes("UTF-8");
+					return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel><item><title>t</title><link>l</link><description>d</description></item></channel></rss>".getBytes("UTF-8");
 				}
 				catch(Exception e)
 				{
@@ -108,6 +133,14 @@ public class FeedItemHelperTest
  		helper.getFeedItems("", modelsLoadedListener);
 		assertFalse(executeWasCalled);
  	}
+
+	public void test_getFeedItems_PassesCachedFeedItemsToListener()
+	{
+		shouldReturnCachedItems = true;
+ 		helper.getFeedItems(url, modelsLoadedListener);
+		assertFalse(executeWasCalled);
+		assertTrue(modelsLoadedListenerWasCalled);
+	}
  
 	public void test_getFeedItems_ExecutesHttpRequest()
  	{
@@ -121,6 +154,11 @@ public class FeedItemHelperTest
  		helper.getFeedItems(url, modelsLoadedListener);
 		this.sleepFor(250);
 		assertTrue(modelsLoadedListenerWasCalled);
+	}
+
+	public void test_getFeedItems_CachesDownloadedFeedItems()
+	{
+		// TODO: figure out how to test correctly
 	}
 
 	private void sleepFor(int milliseconds)

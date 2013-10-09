@@ -50,6 +50,15 @@ public class FeedItemCacheTest
 		assertEquals(0, cache.size());
 	}
 
+	public void test_size_DoesNotIncludeExpiredFeedItems()
+	{
+		FeedItem item = new FeedItem("Boo", "Foo", "Bar", "Baz", new Date());
+		cache.add(item);
+		expirationMilliseconds = 10;
+		sleepFor(15);
+		assertEquals(0, cache.size());
+	}
+
 	public void test_add_DoesNotAppendItemToList_WhenItemIsAlreadyInList()
 	{
 		FeedItem item = new FeedItem("Boo", "Foo", "Bar", "Baz", new Date());

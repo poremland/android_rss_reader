@@ -39,7 +39,7 @@ public class FeedItemCache
 
 	public int size()
 	{
-		return items.size();
+		return this.asList().size();
 	}
 
 	

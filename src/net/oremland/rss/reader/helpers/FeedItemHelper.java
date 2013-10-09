@@ -34,16 +34,30 @@ import net.oremland.rss.reader.models.*;
 
 public class FeedItemHelper
 {
+	private final static HashMap<String, FeedItemCache> caches = new HashMap<String, FeedItemCache>();
+
 	public void getFeedItems(String url, OnModelsLoadedListener<FeedItem> listener)
+	{
+		FeedItemCache cache = this.cacheForUrl(url);
+		if(cache.size() > 0)
+		{
+			listener.onModelsLoaded(cache.asList());
+			return;
+		}
+
+		this.downloadFeedItems(url, listener);
+	}
+
+	private void downloadFeedItems(String url, OnModelsLoadedListener<FeedItem> listener)
 	{
 		if(!TextUtils.isEmpty(url) && listener != null)
 		{
-			AsyncHttpDownloader downloader = this.createDownloader(listener);
+			AsyncHttpDownloader downloader = this.createDownloader(listener, url);
 			downloader.execute(url);
 		}
 	}
 
-	private AsyncHttpDownloader createDownloader(final OnModelsLoadedListener<FeedItem> listener)
+	private AsyncHttpDownloader createDownloader(final OnModelsLoadedListener<FeedItem> listener, final String url)
 	{
 		AsyncHttpDownloader downloader = this.getDownloader();
 		downloader.setOnDownloadListener(new AsyncHttpDownloader.OnDownloadListener()
@@ -55,7 +69,7 @@ public class FeedItemHelper
 
 			public void onComplete(byte[] result)
 			{
-				onDownloadComplete(listener, result);
+				onDownloadComplete(listener, result, url);
 			}
 
 			public void onError(Exception exception)
@@ -76,14 +90,14 @@ public class FeedItemHelper
 	{
 	}
 
-	private void onDownloadComplete(OnModelsLoadedListener<FeedItem> listener, byte[] result)
+	private void onDownloadComplete(OnModelsLoadedListener<FeedItem> listener, byte[] result, String url)
 	{
 		if(listener != null
 			&& result != null
 			&& result.length > 0)
 		{
 			String data = new String(result);
-			parseItemsFromData(listener, data);
+			parseItemsFromData(listener, data, url);
 		}
 	}
 
@@ -92,14 +106,14 @@ public class FeedItemHelper
 		Log.e(this.getClass().getName(), exception.toString(), exception);
 	}
 
-	protected void parseItemsFromData(OnModelsLoadedListener<FeedItem> listener, String data)
+	protected void parseItemsFromData(OnModelsLoadedListener<FeedItem> listener, String data, String url)
 	{
 		FeedParser parser = new FeedParser();
-		parser.setOnParseListener(this.createOnParseListener(listener));
+		parser.setOnParseListener(this.createOnParseListener(listener, url));
 		parser.execute(data);
 	}
 
-	private FeedParser.OnParseListener createOnParseListener(final OnModelsLoadedListener<FeedItem> listener)
+	private FeedParser.OnParseListener createOnParseListener(final OnModelsLoadedListener<FeedItem> listener, final String url)
 	{
 		return new FeedParser.OnParseListener()
 		{
@@ -112,7 +126,7 @@ public class FeedItemHelper
 			@Override
 			public void onComplete(List<FeedItem> items)
 			{
-				onParseComplete(listener, items);
+				onParseComplete(listener, items, url);
 			}
 
 			@Override
@@ -123,11 +137,31 @@ public class FeedItemHelper
 		};
 	}
 
-	private void onParseComplete(OnModelsLoadedListener<FeedItem> listener, List<FeedItem> items)
+	private void onParseComplete(OnModelsLoadedListener<FeedItem> listener, List<FeedItem> items, String url)
 	{
 		if(listener != null && items != null)
 		{
+			this.cacheFeedItems(url, items);
 			listener.onModelsLoaded(items);
 		}
+	}
+
+	private synchronized void cacheFeedItems(String url, List<FeedItem> items)
+	{
+		FeedItemCache cache = this.cacheForUrl(url);
+		for(FeedItem item : items)
+		{
+			cache.add(item);
+		}
+	}
+
+	protected synchronized FeedItemCache cacheForUrl(String url)
+	{
+		if(!caches.containsKey(url))
+		{
+			caches.put(url, new FeedItemCache());
+		}
+
+		return caches.get(url);
 	}
 }
